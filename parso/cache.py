@@ -262,7 +262,10 @@ def _remove_cache_and_update_lock(cache_path=None):
 def _get_hashed_path(hashed_grammar, path, cache_path=None):
     directory = _get_cache_directory_path(cache_path=cache_path)
 
-    file_hash = hashlib.sha256(str(path).encode("utf-8")).hexdigest()
+    # Absolute paths in iOS change frequently due to sandboxing, so we calculate 
+    # an iOS sandbox container invariant path, relative to python-home directory:
+    container_invariant_path = os.path.relpath(path, sys.prefix)
+    file_hash = hashlib.sha256(str(container_invariant_path).encode("utf-8")).hexdigest()
     return os.path.join(directory, '%s-%s.pkl' % (hashed_grammar, file_hash))
 
 
